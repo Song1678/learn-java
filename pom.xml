@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.learn</groupId>
+    <artifactId>learn-java</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>learn-java 练习教程</name>
+
+    <properties>
+        <!-- 与 RuoYi-Vue-Plus 5.x 保持一致：JDK 17 -->
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>5.10.3</junit.version>
+        <!--
+            源码目录：默认是你的练习 src/main/java；
+            加上 -Psolutions 后换成参考答案 solutions/src/main/java。
+            测试代码 (src/test/java) 两边共用。
+        -->
+        <src.dir>src/main/java</src.dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${src.dir}</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <!-- 保留方法参数名，反射章节会用到 -->
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+            <plugin>
+                <!-- mvn compile exec:java -Dexec.mainClass=... 运行 main 方法 -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.3.0</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>solutions</id>
+            <properties>
+                <src.dir>solutions/src/main/java</src.dir>
+            </properties>
+            <build>
+                <!-- 答案的编译结果放到单独目录，不会覆盖你自己的练习编译结果 -->
+                <directory>target-solutions</directory>
+            </build>
+        </profile>
+    </profiles>
+</project>
