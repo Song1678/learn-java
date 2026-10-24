@@ -1,0 +1,23 @@
+-- ================================================================
+-- m01-04 修改表结构 ALTER TABLE
+-- ================================================================
+-- 题目：测试会先创建这样一张表，并插入一行数据：
+-- CREATE TABLE employee (
+-- id       BIGINT AUTO_INCREMENT PRIMARY KEY,
+-- name     VARCHAR(16),
+-- username VARCHAR(32) NOT NULL,
+-- age      INT
+-- );
+-- 请写 SQL 完成以下修改（已有数据不能丢）：
+-- 1. 增加一列 phone VARCHAR(11)，可以为空
+-- 2. 把 name 改成 VARCHAR(32)，并且不能为空
+-- 3. 给 username 加唯一约束
+-- 4. 删除 age 列
+--
+-- 判题方式：测试先建好上面的表，再执行你的 SQL，然后检查：原来的数据还在；phone 列可用；32 个字符的 name 能存下；name 为空报错；username 重复报错；age 列不存在了。
+--
+-- 提示：ALTER TABLE 表名 ADD COLUMN ... / MODIFY COLUMN ... / ADD UNIQUE KEY 名字 (列) / DROP COLUMN ...
+-- ================================================================
+
+-- 在下面写你的 SQL：
+

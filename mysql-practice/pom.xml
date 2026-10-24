@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.learn</groupId>
+    <artifactId>mysql-practice</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>mysql-practice MySQL 练习</name>
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>5.10.3</junit.version>
+        <mysql.version>8.4.0</mysql.version>
+        <!--
+            默认：Java 练习在 src/main/java，SQL 练习在 exercises/
+            -Psolutions：换成参考答案 solutions/java 和 solutions/
+        -->
+        <java.src.dir>src/main/java</java.src.dir>
+        <sql.dir>exercises</sql.dir>
+    </properties>
+
+    <dependencies>
+        <!-- MySQL 官方 JDBC 驱动 -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${java.src.dir}</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <!-- 告诉测试去哪个目录读 SQL 文件 -->
+                    <systemPropertyVariables>
+                        <sql.dir>${sql.dir}</sql.dir>
+                    </systemPropertyVariables>
+                    <!-- 测试共用同一个数据库，必须一个一个跑 -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.3.0</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>solutions</id>
+            <properties>
+                <java.src.dir>solutions/java</java.src.dir>
+                <sql.dir>solutions</sql.dir>
+            </properties>
+            <build>
+                <directory>target-solutions</directory>
+            </build>
+        </profile>
+    </profiles>
+</project>

@@ -1,0 +1,8 @@
+# ordered
+status	status_label	order_count
+1	待付款	2
+2	待接单	1
+3	已接单	1
+4	派送中	1
+5	已完成	19
+6	已取消	4

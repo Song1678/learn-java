@@ -1,0 +1,32 @@
+-- ================================================================
+-- m04-09 多对多：套餐包含哪些菜
+-- ================================================================
+-- 题目：查询每个套餐包含的菜品及份数。
+-- 返回列：setmeal_name, dish_name, copies
+-- 排序：按套餐 id 升序，相同按 setmeal_dish.id 升序（结果顺序必须一致）
+-- 提示：setmeal 和 dish 是多对多关系，中间表是 setmeal_dish
+--
+-- 期望结果：
+-- | setmeal_name | dish_name | copies |
+-- | 单人工作餐 | 宫保鸡丁 | 1 |
+-- | 单人工作餐 | 米饭 | 1 |
+-- | 单人工作餐 | 可乐 | 1 |
+-- | 双人套餐 | 水煮鱼 | 1 |
+-- | 双人套餐 | 鱼香肉丝 | 1 |
+-- | 双人套餐 | 米饭 | 2 |
+-- | 双人套餐 | 酸梅汤 | 2 |
+-- | 回锅肉套餐 | 回锅肉 | 1 |
+-- | 回锅肉套餐 | 米饭 | 1 |
+-- （9 行）
+-- ================================================================
+
+-- 在下面写你的 SQL：
+SELECT s.name AS setmeal_name, d.name AS dish_name, sd.copies
+FROM setmeal s
+         JOIN setmeal_dish sd ON sd.setmeal_id = s.id
+         JOIN dish d ON d.id = sd.dish_id
+ORDER BY s.id, sd.id;
+
+-- 【讲解】
+-- 一对多：在“多”的一方存外键（dish.category_id）。
+-- 多对多：建一张中间表，存两边的 id（setmeal_dish.setmeal_id + dish_id）。RuoYi 里的 用户-角色（sys_user_role）也是这样。

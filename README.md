@@ -6,7 +6,8 @@
 ```
 阶段一：巩固基础（ch01~ch07）   → 对应廖雪峰 1~7 章，100 多个待填写的方法
 阶段二：衔接框架（ch08~ch09）   → Lambda/Stream/时间 API、手写迷你 IoC 容器、内存版“迷你外卖”
-阶段三：框架与项目（docs/后续路线.md）→ Spring Boot → MyBatis-Plus → RuoYi-Vue-Plus → 外卖项目
+阶段三：MySQL 练习（mysql-practice/）→ 64 道 SQL 题 + JDBC，同样自动判题
+阶段四：框架与项目（docs/后续路线.md）→ Spring Boot → MyBatis-Plus → RuoYi-Vue-Plus → 外卖项目
 ```
 
 ---
@@ -89,7 +90,11 @@ learn-java/
 | ch08 衔接篇 | [docs/ch08](docs/ch08-衔接篇.md) | ☐ LambdaExercises<br>☐ StreamExercises<br>☐ TimeExercises<br>☐ MiniContainer（迷你 IoC） | 函数式编程、日期与时间 |
 | ch09 迷你外卖 | [docs/ch09](docs/ch09-迷你外卖.md) | ☐ InMemoryMapper<br>☐ CategoryService<br>☐ DishService<br>☐ ShoppingCartService<br>☐ OrderService<br>☐ ReportService<br>☐ 运行 TakeoutApp | — |
 
-### 阶段三：框架与完整项目
+### 阶段三：MySQL
+
+见 [mysql-practice/README.md](mysql-practice/README.md)（独立的 Maven 项目，需要本机安装 MySQL 8）。
+
+### 阶段四：框架与完整项目
 
 见 [docs/后续路线.md](docs/后续路线.md)。
 
