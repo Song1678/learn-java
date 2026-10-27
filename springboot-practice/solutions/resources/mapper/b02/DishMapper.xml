@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    b02 练习：动态 SQL。namespace 必须是 Mapper 接口的全类名。
+
+    注意：这个 XML 文件写错（标签没闭合、属性拼错等）会导致整个项目启动失败，所有测试都会报错，
+    报错信息里会有 "DishMapper.xml"，按提示改就行。
+    XML 里不能直接写 < 号，要写成 &lt; ，或者用 <![CDATA[ price <= #{maxPrice} ]]> 包起来。
+-->
+<mapper namespace="com.learn.web.b02_dynamic.DishMapper">
+
+    <!--
+        2.1 + 2.2 公共的 WHERE 条件，用 <sql> 定义一次，selectList 和 selectCount 都用 <include> 引用：
+          - name 不为 null 且不为空字符串：name LIKE '%name%'
+          - categoryId 不为 null：category_id = ?
+          - status 不为 null：status = ?
+          - minPrice 不为 null：price >= ?
+          - maxPrice 不为 null：price <= ?
+        提示：<where> 标签会自动加上 WHERE，并去掉多余的开头 AND；一个条件都没有时就不加 WHERE。
+        <if test="..."> 里写的是参数对象的字段名，例如 test="name != null and name != ''"
+    -->
+    <!-- @answer 2.1 写 <sql id="whereClause">，再写 selectList 和 selectCount（resultType 写全类名） -->
+    <sql id="whereClause">
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="minPrice != null">
+                AND price &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                AND price &lt;= #{maxPrice}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectList" resultType="com.learn.web.b02_dynamic.Dish">
+        SELECT * FROM dish
+        <include refid="whereClause"/>
+        ORDER BY id
+    </select>
+
+    <select id="selectCount" resultType="long">
+        SELECT COUNT(*) FROM dish
+        <include refid="whereClause"/>
+    </select>
+    <!-- @end -->
+
+    <!--
+        2.3 updateSelective：只更新不为 null 的字段（name、categoryId、price、status、description），
+        并且总是把 update_time 设为 NOW()。WHERE id = #{id}。
+        提示：<set> 标签会自动加上 SET，并去掉最后多余的逗号。
+    -->
+    <!-- @answer 2.3 写 <update id="updateSelective"> -->
+    <update id="updateSelective">
+        UPDATE dish
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="description != null">description = #{description},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    <!-- @end -->
+
+    <!--
+        2.4 selectByIds：WHERE id IN (1, 2, 3)，按 id 升序
+        提示：<foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+        collection 的值就是接口方法里 @Param("ids") 起的名字
+    -->
+    <!-- @answer 2.4 写 <select id="selectByIds"> -->
+    <select id="selectByIds" resultType="com.learn.web.b02_dynamic.Dish">
+        SELECT * FROM dish WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY id
+    </select>
+    <!-- @end -->
+
+    <!-- 2.5 deleteByIds：DELETE ... WHERE id IN (...) -->
+    <!-- @answer 2.5 写 <delete id="deleteByIds"> -->
+    <delete id="deleteByIds">
+        DELETE FROM dish WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- @end -->
+
+    <!--
+        2.6 insertFlavors：一条语句插入多行
+            INSERT INTO dish_flavor (dish_id, name, value) VALUES (?, ?, ?), (?, ?, ?), ...
+        提示：foreach 的 item 是一个 DishFlavor 对象，取字段写 #{f.dishId}
+    -->
+    <!-- @answer 2.6 写 <insert id="insertFlavors"> -->
+    <insert id="insertFlavors">
+        INSERT INTO dish_flavor (dish_id, name, value) VALUES
+        <foreach collection="flavors" item="f" separator=",">
+            (#{f.dishId}, #{f.name}, #{f.value})
+        </foreach>
+    </insert>
+    <!-- @end -->
+
+    <!--
+        2.7 selectOrderBy：ORDER BY 列名 ASC/DESC，然后再按 id 升序（排序值相同时顺序固定）
+        列名只能用 ${column}（直接拼接）；asc 为 true 用 ASC，否则 DESC。
+        提示：<choose><when test="asc">ASC</when><otherwise>DESC</otherwise></choose> 相当于 if-else
+    -->
+    <!-- @answer 2.7 写 <select id="selectOrderBy"> -->
+    <select id="selectOrderBy" resultType="com.learn.web.b02_dynamic.Dish">
+        SELECT * FROM dish
+        ORDER BY ${column}
+        <choose>
+            <when test="asc">ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
+        , id
+    </select>
+    <!-- @end -->
+
+</mapper>

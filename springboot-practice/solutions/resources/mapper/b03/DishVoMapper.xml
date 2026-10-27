@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.web.b03_resultmap.DishVoMapper">
+
+    <!--
+        3.1 selectWithCategory：dish JOIN category，查出 d.id, d.name, d.category_id, c.name AS category_name, d.price, d.status
+        categoryId 不为 null 时加条件 d.category_id = #{categoryId}；按 d.id 升序。
+        提示：两张表都有 name 列，分类名称要起别名 category_name，开了驼峰映射后会自动装进 categoryName 字段，
+        所以这里用 resultType 就够了，不用写 resultMap。
+    -->
+    <!-- @answer 3.1 写 <select id="selectWithCategory"> -->
+    <select id="selectWithCategory" resultType="com.learn.web.b03_resultmap.DishVO">
+        SELECT d.id, d.name, d.category_id, c.name AS category_name, d.price, d.status
+        FROM dish d
+        JOIN category c ON c.id = d.category_id
+        <where>
+            <if test="categoryId != null">
+                d.category_id = #{categoryId}
+            </if>
+        </where>
+        ORDER BY d.id
+    </select>
+    <!-- @end -->
+
+    <!--
+        3.2 selectDetail：一个菜品 + 它的所有口味（一对多）
+        SQL：dish d JOIN category c LEFT JOIN dish_flavor f（没有口味的菜品也要查出来），口味按 f.id 升序。
+        查出来是多行（每个口味一行，菜品的列在每行重复），需要 resultMap 告诉 MyBatis 怎么“合并”：
+          <resultMap id="dishDetailMap" type="...DishVO">
+              <id column="id" property="id"/>               ← 用 id 判断哪些行属于同一个菜品
+              <result column="name" property="name"/>
+              ... 其他字段
+              <collection property="flavors" ofType="...FlavorVO">
+                  <result column="flavor_name" property="name"/>
+                  <result column="flavor_value" property="value"/>
+              </collection>
+          </resultMap>
+        注意 dish 和 dish_flavor 都有 name 列，口味的列要起别名（flavor_name、flavor_value）。
+        菜品没有口味时，LEFT JOIN 出来的口味列都是 NULL，MyBatis 会给一个空的 flavors 列表。
+    -->
+    <!-- @answer 3.2 写 <resultMap id="dishDetailMap"> 和 <select id="selectDetail" resultMap="dishDetailMap"> -->
+    <resultMap id="dishDetailMap" type="com.learn.web.b03_resultmap.DishVO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="price" property="price"/>
+        <result column="status" property="status"/>
+        <collection property="flavors" ofType="com.learn.web.b03_resultmap.FlavorVO">
+            <result column="flavor_name" property="name"/>
+            <result column="flavor_value" property="value"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectDetail" resultMap="dishDetailMap">
+        SELECT d.id, d.name, d.category_id, c.name AS category_name, d.price, d.status,
+               f.name AS flavor_name, f.value AS flavor_value
+        FROM dish d
+        JOIN category c ON c.id = d.category_id
+        LEFT JOIN dish_flavor f ON f.dish_id = d.id
+        WHERE d.id = #{id}
+        ORDER BY f.id
+    </select>
+    <!-- @end -->
+
+    <!--
+        3.3 selectSetmeals：所有套餐 + 包含的菜品（多对多：setmeal → setmeal_dish → dish）
+        返回列：s.id, s.name, s.price, d.name AS dish_name, sd.copies；按 s.id、sd.id 升序。
+        同样用 resultMap + <collection property="dishes" ofType="...SetmealVO$SetmealDishVO">
+        （内部类的全类名用 $ 连接）
+    -->
+    <!-- @answer 3.3 写 <resultMap> 和 <select id="selectSetmeals"> -->
+    <resultMap id="setmealMap" type="com.learn.web.b03_resultmap.SetmealVO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="price" property="price"/>
+        <collection property="dishes" ofType="com.learn.web.b03_resultmap.SetmealVO$SetmealDishVO">
+            <result column="dish_name" property="dishName"/>
+            <result column="copies" property="copies"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectSetmeals" resultMap="setmealMap">
+        SELECT s.id, s.name, s.price, d.name AS dish_name, sd.copies
+        FROM setmeal s
+        JOIN setmeal_dish sd ON sd.setmeal_id = s.id
+        JOIN dish d ON d.id = sd.dish_id
+        ORDER BY s.id, sd.id
+    </select>
+    <!-- @end -->
+
+</mapper>

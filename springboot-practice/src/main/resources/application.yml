@@ -1,0 +1,46 @@
+# =====================================================================
+# Spring Boot 配置文件。数据库账号密码不在这里改，改项目根目录的 db.properties。
+# =====================================================================
+server:
+  port: 8080
+
+spring:
+  application:
+    name: springboot-practice
+  config:
+    # 读取项目根目录的 db.properties（里面是 db.host / db.password 等），找不到就用下面 ${...:默认值}
+    import: optional:file:./db.properties
+  datasource:
+    # createDatabaseIfNotExist=true：库不存在时自动创建
+    url: jdbc:mysql://${db.host:localhost}:${db.port:3306}/${db.database:learn_web}?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${db.username:root}
+    password: ${db.password:123456}
+  sql:
+    init:
+      # 每次启动都执行 sql/schema.sql + sql/data.sql，把 learn_web 库重置成示例数据。
+      # 不想每次重置就改成 never
+      mode: always
+      schema-locations: classpath:sql/schema.sql
+      data-locations: classpath:sql/data.sql
+      encoding: UTF-8
+  jackson:
+    time-zone: GMT+8
+
+mybatis-plus:
+  # XML 映射文件的位置（b02、b03、x01 会用到）
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    # 下划线转驼峰：数据库列 category_id 自动对应 Java 字段 categoryId（MyBatis-Plus 默认就是 true，这里写出来提醒你）
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+
+logging:
+  level:
+    # 把 com.learn.web 包的日志级别设成 debug，就能在控制台看到 MyBatis 执行的每一条 SQL 和参数
+    com.learn.web: debug
+
+# ---------------------------------------------------------------------
+# 下面是我们自己的业务配置（w01、w03 练习）
+# ---------------------------------------------------------------------
+# TODO w01 练习 1.5：在这里加上店铺配置 takeout.shop.*（见 docs/w01）；w03 练习 3.4：加上 takeout.worker-id

@@ -1,0 +1,13 @@
+# 测试专用配置（@ActiveProfiles("test") 时生效，会覆盖 application.yml 里的同名配置）
+spring:
+  datasource:
+    url: jdbc:mysql://${db.host:localhost}:${db.port:3306}/learn_web_test?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+  sql:
+    init:
+      # 测试不在启动时初始化，而是每个测试方法之前用 @Sql 重置（见 DbTestBase）
+      mode: never
+
+logging:
+  level:
+    # 测试时默认不打印 SQL，免得输出太多。想看 SQL 就改成 debug
+    com.learn.web: info

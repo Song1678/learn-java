@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.web.b03_resultmap.ReportMapper">
+
+    <!--
+        3.4 sumTurnoverByDay：已完成（status = 5）的订单，order_time 在 [begin, end) 之间，
+        按日期分组求和：返回列 order_date（DATE(order_time)）、turnover（SUM(amount)），按日期升序。
+        列名 order_date 会自动对应 TurnoverDTO 的 orderDate 字段（LocalDate 类型）。
+        提示：XML 里 < 要写成 &lt;
+    -->
+    <!-- @answer 3.4 写 <select id="sumTurnoverByDay"> -->
+    <select id="sumTurnoverByDay" resultType="com.learn.web.b03_resultmap.TurnoverDTO">
+        SELECT DATE(order_time) AS order_date, SUM(amount) AS turnover
+        FROM orders
+        WHERE status = 5
+          AND order_time &gt;= #{begin}
+          AND order_time &lt; #{end}
+        GROUP BY DATE(order_time)
+        ORDER BY order_date
+    </select>
+    <!-- @end -->
+
+    <!--
+        3.5 salesTop：已完成订单里的明细（order_detail JOIN orders），order_time 在 [begin, end) 之间，
+        按商品名称分组，number = SUM(od.number)，按 number 降序、name 升序，取前 #{limit} 个。
+    -->
+    <!-- @answer 3.5 写 <select id="salesTop"> -->
+    <select id="salesTop" resultType="com.learn.web.b03_resultmap.SalesTopDTO">
+        SELECT od.name, SUM(od.number) AS number
+        FROM order_detail od
+        JOIN orders o ON o.id = od.order_id
+        WHERE o.status = 5
+          AND o.order_time &gt;= #{begin}
+          AND o.order_time &lt; #{end}
+        GROUP BY od.name
+        ORDER BY number DESC, od.name
+        LIMIT #{limit}
+    </select>
+    <!-- @end -->
+
+</mapper>

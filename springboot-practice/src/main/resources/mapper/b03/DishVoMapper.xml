@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.web.b03_resultmap.DishVoMapper">
+
+    <!--
+        3.1 selectWithCategory：dish JOIN category，查出 d.id, d.name, d.category_id, c.name AS category_name, d.price, d.status
+        categoryId 不为 null 时加条件 d.category_id = #{categoryId}；按 d.id 升序。
+        提示：两张表都有 name 列，分类名称要起别名 category_name，开了驼峰映射后会自动装进 categoryName 字段，
+        所以这里用 resultType 就够了，不用写 resultMap。
+    -->
+    <!-- TODO 3.1 写 <select id="selectWithCategory"> -->
+
+    <!--
+        3.2 selectDetail：一个菜品 + 它的所有口味（一对多）
+        SQL：dish d JOIN category c LEFT JOIN dish_flavor f（没有口味的菜品也要查出来），口味按 f.id 升序。
+        查出来是多行（每个口味一行，菜品的列在每行重复），需要 resultMap 告诉 MyBatis 怎么“合并”：
+          <resultMap id="dishDetailMap" type="...DishVO">
+              <id column="id" property="id"/>               ← 用 id 判断哪些行属于同一个菜品
+              <result column="name" property="name"/>
+              ... 其他字段
+              <collection property="flavors" ofType="...FlavorVO">
+                  <result column="flavor_name" property="name"/>
+                  <result column="flavor_value" property="value"/>
+              </collection>
+          </resultMap>
+        注意 dish 和 dish_flavor 都有 name 列，口味的列要起别名（flavor_name、flavor_value）。
+        菜品没有口味时，LEFT JOIN 出来的口味列都是 NULL，MyBatis 会给一个空的 flavors 列表。
+    -->
+    <!-- TODO 3.2 写 <resultMap id="dishDetailMap"> 和 <select id="selectDetail" resultMap="dishDetailMap"> -->
+
+    <!--
+        3.3 selectSetmeals：所有套餐 + 包含的菜品（多对多：setmeal → setmeal_dish → dish）
+        返回列：s.id, s.name, s.price, d.name AS dish_name, sd.copies；按 s.id、sd.id 升序。
+        同样用 resultMap + <collection property="dishes" ofType="...SetmealVO$SetmealDishVO">
+        （内部类的全类名用 $ 连接）
+    -->
+    <!-- TODO 3.3 写 <resultMap> 和 <select id="selectSetmeals"> -->
+
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Spring Boot 的“父工程”：统一管理了几百个常用依赖的版本，所以下面很多依赖不用写 version -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.6</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.learn</groupId>
+    <artifactId>springboot-practice</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>springboot-practice Spring Boot + MyBatis 练习</name>
+
+    <properties>
+        <!-- 与 RuoYi-Vue-Plus 5.x 保持一致：JDK 17 -->
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mybatis-plus.version>3.5.14</mybatis-plus.version>
+        <!-- mvn spring-boot:run 启动的主类（w03 还有一个自己的启动类，所以要指定） -->
+        <start-class>com.learn.web.WebPracticeApplication</start-class>
+        <!--
+            默认：练习代码 src/main/java + src/main/resources
+            -Psolutions：换成参考答案 solutions/java + solutions/resources
+            测试代码 src/test/java 两边共用。
+        -->
+        <java.src.dir>src/main/java</java.src.dir>
+        <res.dir>src/main/resources</res.dir>
+    </properties>
+
+    <dependencies>
+        <!-- Web：内置 Tomcat + Spring MVC + Jackson(JSON) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- 参数校验：@NotBlank、@Size、@Validated ... -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <!-- MyBatis-Plus（已经包含 MyBatis 和 mybatis-spring，b01~b04 的纯 MyBatis 写法也能用） -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <!-- MyBatis-Plus 3.5.9 起，分页插件需要单独引入这个模块 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <!-- MySQL 驱动（版本由 Spring Boot 管理） -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Lombok：@Data 自动生成 getter/setter，RuoYi-Vue-Plus 全项目都在用 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- 测试：JUnit 5 + Spring Test(MockMvc) + AssertJ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${java.src.dir}</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>${res.dir}</directory>
+            </resource>
+            <!-- 示例数据库脚本放到 classpath 的 sql/ 下：启动时初始化、测试时重置都用它 -->
+            <resource>
+                <directory>sql</directory>
+                <targetPath>sql</targetPath>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- 测试共用同一个数据库，必须一个一个跑 -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- mvn spring-boot:run 启动项目 -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>solutions</id>
+            <properties>
+                <java.src.dir>solutions/java</java.src.dir>
+                <res.dir>solutions/resources</res.dir>
+            </properties>
+            <build>
+                <!-- 答案的编译结果放到单独目录，不会覆盖你自己的练习编译结果 -->
+                <directory>target-solutions</directory>
+            </build>
+        </profile>
+    </profiles>
+</project>

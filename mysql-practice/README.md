@@ -95,4 +95,4 @@ mysql-practice/
 - [docs/表结构说明.md](docs/表结构说明.md)：每张表是干什么的、表之间怎么关联（**做题前先看一遍**）
 - [docs/常见报错.md](docs/常见报错.md)：做题时遇到报错先来这里查
 
-做完之后回到上一级的 [docs/后续路线.md](../docs/后续路线.md)，下一步是 Spring Boot + MyBatis。
+做完之后回到上一级的 [docs/后续路线.md](../docs/后续路线.md)，下一步是 Spring Boot + MyBatis：[springboot-practice](../springboot-practice/README.md)。
